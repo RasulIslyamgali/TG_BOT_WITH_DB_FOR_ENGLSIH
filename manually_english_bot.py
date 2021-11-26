@@ -1,5 +1,4 @@
 import datetime
-import time
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.dispatcher.filters.state import StatesGroup, State
