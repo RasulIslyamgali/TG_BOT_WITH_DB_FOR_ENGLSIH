@@ -10,7 +10,6 @@ from database import *
 from googletrans import Translator
 from alphabet_detector import AlphabetDetector
 import gtts
-from playsound import playsound
 import os, time
 # import pytesseract as tess
 # tess.pytesseract.tesseract_cmd = r"C:\Users\User\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"

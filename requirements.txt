@@ -1,0 +1,5 @@
+aiogram
+alphabet-detector
+googletrans
+gtts
+schedule
