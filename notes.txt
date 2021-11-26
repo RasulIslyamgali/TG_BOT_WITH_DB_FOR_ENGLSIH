@@ -1,0 +1,10 @@
+Heroku:
+
+login: rasul.seikolabs@gmail.com
+passw: alsdjkf23423_
+
+
+
+------------------------------------------
+
+
