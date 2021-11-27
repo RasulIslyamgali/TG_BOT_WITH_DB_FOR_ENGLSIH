@@ -1,5 +1,5 @@
 aiogram
 alphabet-detector
-googletrans
+googletrans==3.1.0a0
 gtts
 schedule
