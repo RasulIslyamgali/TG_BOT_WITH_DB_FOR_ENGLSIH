@@ -64,7 +64,7 @@ async def say_hi(message: types.Message):
     await message.reply("Привет\n\nНажми на /help")
     # add_column_to_table("user_id", "english_words.db", "english_words")
     date = datetime.datetime.today()
-    add_new_unique_users(user_name=message.from_user.full_name, user_id=message.from_user.id)
+    add_new_unique_users(user_name=message.from_user.full_name, user_id=message.from_user.id, bot=bot)
 
 
 my_commands = """

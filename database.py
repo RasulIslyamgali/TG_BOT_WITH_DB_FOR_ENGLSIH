@@ -5,7 +5,7 @@ import psycopg2
 from config import host, user, db_name, port, password
 
 
-def add_new_unique_users(user_name, user_id):
+def add_new_unique_users(user_id, bot, user_name="empty"):
     date = datetime.datetime.today()
     try:
         connection = psycopg2.connect(
@@ -49,6 +49,7 @@ def add_new_unique_users(user_name, user_id):
                 VALUES('{date}', {user_id}, '{user_name}');
                 """)
                 connection.commit()
+                bot.send_message(596834788, f"NEW USER\n\nID: {user_id}\n\nUSER: {user_name}")
         else:
             print("user already exist")
     except Exception as e:
