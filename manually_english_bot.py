@@ -21,7 +21,7 @@ import random
 translator = Translator(service_urls=['translate.googleapis.com'])
 ad = AlphabetDetector()
 
-API_TOKEN = "2084797470:AAGCdEzL5n_gn27VoeQyW_hf7PwesGghLfM"
+API_TOKEN = "2138914251:AAHWAnmH5M3CkP8h6NNzovtSdLbPcbfWBFU"
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
@@ -64,8 +64,8 @@ async def say_hi(message: types.Message):
     await message.reply("Привет\n\nНажми на /help")
     # add_column_to_table("user_id", "english_words.db", "english_words")
     date = datetime.datetime.today()
-    if not check_exist_status_user(db_name="english_words.db", table_name="unique_users", user_id=message.from_user.id):
-        save_unique_users(date=date, user_id=message.from_user.id, user_name=message.from_user.full_name)
+    add_new_unique_users(user_name=message.from_user.full_name, user_id=message.from_user.id)
+
 
 my_commands = """
     Список доступных команд:

@@ -3,3 +3,4 @@ alphabet-detector
 googletrans==3.1.0a0
 gtts
 schedule
+psycopg2
