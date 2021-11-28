@@ -99,7 +99,7 @@ async def send_message_to_developer(message: types.Message, state: FSMContext):
                         "Если благодарность, то позвольте сказать Спасибо через это сообщение :)\n"
                         "Это для меня очень ценно!")
     text_for_dev = f"MESSAGE FROM:\n\n" \
-                   f"id: {message.from_user.id}, " \
+                   f"ID: {message.from_user.id}\n\n" \
                    f"USER: {message.from_user.full_name} \n\n" \
                    f"USERNAME: @{message.from_user.username}\n\n" \
                    f"MESSAGE:\n\n" + \
