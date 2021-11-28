@@ -13,9 +13,12 @@ import gtts
 import os, time
 # import pytesseract as tess
 # tess.pytesseract.tesseract_cmd = r"C:\Users\User\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
+# tess.pytesseract.tesseract_cmd = os.path.join(os.getcwd(), "Tesseract-OCR", "tesseract.exe")
+# tess.pytesseract.tesseract_cmd = r"C:\Users\User\Desktop\Rasul\Python\any_projects_and_scripts\tg_bot_for_manually_english\manually_english_bot"
 # from PIL import Image
 import schedule
 import random
+# import cv2
 
 
 translator = Translator(service_urls=['translate.googleapis.com'])
@@ -267,24 +270,33 @@ async def delete_work_state1(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(content_types=['photo'])
 # async def handle_docs_photo(message: types.Message):
-#     await message.photo[-1].download(os.path.join(os.getcwd(), 'get_text_test.jpg'))
+#     await message.photo[-1].download(os.path.join(os.getcwd(), 'get_text_test.png'))
 #     await bot.send_message(message.chat.id, "Идет процесс чтения файла...")
 #
 #     async def get_text_from_photo():
 #         flag_exist_photo = False
+#         print(1)
 #         while not flag_exist_photo:
+#             print(2)
 #             all_files = [file for file in os.listdir(os.getcwd()) if os.path.isfile(os.path.join(os.getcwd(), file))]
-#             if "get_text_test.jpg" in all_files:
+#             if "get_text_test.png" in all_files:
 #                 flag_exist_photo = True
 #             time.sleep(0.2)
-#
-#         image_1 = Image.open(os.path.join(os.getcwd(), "get_text_test.jpg"))
-#         text_1 = tess.image_to_string(image=image_1)
-#         os.remove(os.path.join(os.getcwd(), "get_text_test.jpg"))
+#             print(3)
+#         print(4)
+#         image_1 = Image.open(os.path.join(os.getcwd(), "get_text_test.png"))
+#         # image_1 = cv2.imread(os.path.join(os.getcwd(), "get_text_test.png"))
+#         # print(5)
+#         text_1 = tess.image_to_string(image=image_1, timeout=15)
+#         print(6)
+#         os.remove(os.path.join(os.getcwd(), "get_text_test.png"))
 #         return text_1
 #     text_1 = await get_text_from_photo()
-#
-#     await bot.send_message(message.chat.id, f"Текст с изображения:\n\n{text_1}")
+#     try:
+#         print(7)
+#         await bot.send_message(message.chat.id, f"Текст с изображения:\n\n{text_1}")
+#     except:
+#         await bot.send_message(message.chat.id, f"Текст с изображения:")
 #
 #     translated = translator.translate(text=text_1, dest="ru")
 #     await bot.send_message(message.chat.id, f"Перевод текста:\n\n{translated.text}")
@@ -347,6 +359,16 @@ async def delete_work_state1(message: types.Message, state: FSMContext):
 #             pass
 #         await asyncio.sleep(600)
 
+# @dp.message_handler()
+# async def nothing_to_stop():
+#     # stop нечего остановить
+#     pass
+
+@dp.message_handler(commands=["to_her"])
+async def help_text(message: types.Message):
+    await bot.send_message(1053013455, "Напиши мне. Если скучаешь")
+    await bot.send_message(596834788, 'was send message to her')
+
 
 def two_():
     while True:
@@ -357,6 +379,6 @@ def two_():
             executor.start_polling(dp, skip_updates=True)
 
 
-def one_():
-    while True:
-        asyncio.run(send_random_word_in_manually_database())
+# def one_():
+#     while True:
+#         asyncio.run(send_random_word_in_manually_database())
