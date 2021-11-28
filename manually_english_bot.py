@@ -21,7 +21,8 @@ import random
 translator = Translator(service_urls=['translate.googleapis.com'])
 ad = AlphabetDetector()
 
-API_TOKEN = "2138914251:AAHWAnmH5M3CkP8h6NNzovtSdLbPcbfWBFU"
+# API_TOKEN = "2138914251:AAHWAnmH5M3CkP8h6NNzovtSdLbPcbfWBFU" # for test
+API_TOKEN = "2084797470:AAGCdEzL5n_gn27VoeQyW_hf7PwesGghLfM"
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
@@ -62,8 +63,6 @@ class TransalteAndPronounce(StatesGroup):
 @dp.message_handler(commands=["start"])
 async def say_hi(message: types.Message):
     await message.reply("Привет\n\nНажми на /help")
-    # add_column_to_table("user_id", "english_words.db", "english_words")
-    date = datetime.datetime.today()
     add_new_unique_users(user_name=message.from_user.full_name, user_id=message.from_user.id, bot=bot)
 
 
