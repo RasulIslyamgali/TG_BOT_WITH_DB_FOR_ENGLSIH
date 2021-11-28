@@ -63,7 +63,8 @@ class TransalteAndPronounce(StatesGroup):
 @dp.message_handler(commands=["start"])
 async def say_hi(message: types.Message):
     await message.reply("Привет\n\nНажми на /help")
-    add_new_unique_users(user_name=message.from_user.full_name, user_id=message.from_user.id, bot=bot)
+    if add_new_unique_users(user_name=message.from_user.full_name, user_id=message.from_user.id, bot=bot):
+        await bot.send_message(596834788, f"NEW USER:\n\nID: {message.from_user.id}\n\nUSER: {message.from_user.full_name}")
 
 
 my_commands = """

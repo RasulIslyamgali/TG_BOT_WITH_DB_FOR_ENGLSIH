@@ -42,6 +42,7 @@ def add_new_unique_users(user_id, bot, user_name="empty"):
         #     ALTER COLUMN user_id TYPE INT;
         #     """)
         #     connection.commit()
+        new_user_added = False
         if not check_exist_status_user_id(user_id=user_id):
             with connection.cursor() as cursor:
                 cursor.execute(f"""
@@ -49,7 +50,7 @@ def add_new_unique_users(user_id, bot, user_name="empty"):
                 VALUES('{date}', {user_id}, '{user_name}');
                 """)
                 connection.commit()
-                bot.send_message(596834788, f"NEW USER\n\nID: {user_id}\n\nUSER: {user_name}")
+                new_user_added = True
         else:
             print("user already exist")
     except Exception as e:
@@ -60,8 +61,12 @@ def add_new_unique_users(user_id, bot, user_name="empty"):
             if connection:
                 connection.close()
                 print("[INFO] PostgreSQL connection closed")
+                return new_user_added
+            else:
+                return new_user_added
         except Exception as e:
             print("[INFO] Error in finally block add_new_unique_users", e)
+            return new_user_added
 
 
 def check_exist_status_user_id(user_id: int):
