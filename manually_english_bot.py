@@ -100,6 +100,7 @@ async def send_message_to_developer(message: types.Message, state: FSMContext):
                         "Это для меня очень ценно!")
     text_for_dev = f"Сообщение от пользователя: id: {message.from_user.id}, " \
                    f"Имя: {message.from_user.full_name} \n\n" \
+                   f"USERNAME: @{message.from_user.username}" \
                    f"Сообщение:\n\n" + \
                     message.text
     await bot.send_message(596834788, text_for_dev)
