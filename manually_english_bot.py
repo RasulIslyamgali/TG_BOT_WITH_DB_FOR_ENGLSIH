@@ -69,14 +69,13 @@ async def say_hi(message: types.Message):
 
 my_commands = """
     Список доступных команд:
-
     /start
-    /add_new_word
     /translate
-    /send_my_words
-    /delete_word
     /send_message_to_developer
     """
+#     /send_my_words
+#     /delete_word
+# / add_new_word
 
 
 @dp.message_handler(commands=["help"])
@@ -150,6 +149,7 @@ async def with_command_translate_and_pronounce(message: types.Message):
 
 @dp.message_handler(state=TransalteAndPronounce.hendle1)
 async def translate_and_pronounce(message: types.Message, state: FSMContext):
+    text_for_pronounce = ""
     if message.text == "stop":
         await state.finish()
         await bot.send_message(message.chat.id, "Бот вернулся в исходное состояние")
@@ -157,15 +157,16 @@ async def translate_and_pronounce(message: types.Message, state: FSMContext):
         return
     if ad.only_alphabet_chars(f"{message.text}", "CYRILLIC"):
         translated = translator.translate(text=message.text, dest="en")
+        text_for_pronounce = translated
     elif ad.detect_alphabet(u'Cyrillic and кириллический') == {'CYRILLIC', 'LATIN'} and not ad.is_latin(
             f"{message.text}"):
         translated = translator.translate(text=message.text, dest="en")
+        text_for_pronounce = translated
     else:
         translated = translator.translate(text=message.text, dest="ru")
-    print(translated.text)
-    print(type(translated))
+        text_for_pronounce = message.text
     await bot.send_message(message.chat.id, translated.text)
-    tts = gtts.gTTS(message.text)
+    tts = gtts.gTTS(text_for_pronounce)
     tts.save("translate_and_pronounce.mp3")
     await bot.send_audio(message.from_user.id,
                          audio=open(os.path.join(os.getcwd(), "translate_and_pronounce.mp3"), "rb"), title='Озвучка')
@@ -287,61 +288,61 @@ async def delete_work_state1(message: types.Message, state: FSMContext):
 #     await bot.send_message(message.chat.id, my_commands)
 
 
-@dp.message_handler(commands=["send_my_words"])
-async def send_my_words_status(message: types.Message):
-    all_users = get_user_send_words_allow_status()
-    flag_exist = False
-    for user in all_users:
-        if message.from_user.id == user[1]:
-            flag_exist = True
-            if user[4] == "yes":
-                change_user_send_word_allow_status(user_id=message.from_user.id, allow_status="no")
-                await bot.send_message(message.chat.id, "Вы отключили режим отправки слов")
-            else:
-                change_user_send_word_allow_status(user_id=message.from_user.id, allow_status="yes")
-                await bot.send_message(message.chat.id, "Вы включили режим отправки слов")
-    if flag_exist:
-        return
-    else:
-        set_user_send_word_allow_status(message.from_user.id, message.from_user.full_name)
-        await bot.send_message(message.chat.id, "Вы включили режим отправки английских слов, каждые Х минут времени."
-                                                "Чтобы отключить нажмите на команду /send_my_words еще раз")
+# @dp.message_handler(commands=["send_my_words"])
+# async def send_my_words_status(message: types.Message):
+#     all_users = get_user_send_words_allow_status()
+#     flag_exist = False
+#     for user in all_users:
+#         if message.from_user.id == user[1]:
+#             flag_exist = True
+#             if user[4] == "yes":
+#                 change_user_send_word_allow_status(user_id=message.from_user.id, allow_status="no")
+#                 await bot.send_message(message.chat.id, "Вы отключили режим отправки слов")
+#             else:
+#                 change_user_send_word_allow_status(user_id=message.from_user.id, allow_status="yes")
+#                 await bot.send_message(message.chat.id, "Вы включили режим отправки слов")
+#     if flag_exist:
+#         return
+#     else:
+#         set_user_send_word_allow_status(message.from_user.id, message.from_user.full_name)
+#         await bot.send_message(message.chat.id, "Вы включили режим отправки английских слов, каждые Х минут времени."
+#                                                 "Чтобы отключить нажмите на команду /send_my_words еще раз")
 
 
-async def send_random_word_in_manually_database():
-    while True:
-        all_users = get_user_send_words_allow_status()
-        rows = get_all_items_from_db("english_words.db", "english_words")
-        random_word = rows[random.randint(0, len(rows) - 1)]
-        tts = gtts.gTTS(random_word[2])
-        tts.save("send_word_audio.mp3")
-        print("i am working: ", all_users)
-        for user in all_users:
-            if user[4] == "yes":
-                print("user_id", user[1])
-                if random_word[4] != "no examples":
-                    await bot.send_message(user[1], f"{random_word[2]} --- {random_word[3]}\n\n{random_word[4]}\n\nЧтобы отключить отправку слов нажмите на команду /send_my_words")
-                    await bot.send_audio(user[1],
-                                         audio=open(os.path.join(os.getcwd(), "send_word_audio.mp3"), "rb"),
-                                         title='Озвучка')
-                    os.remove(os.path.join(os.getcwd(), "send_word_audio.mp3"))
-                else:
-                    try:
-                        await bot.send_message(user[1], f"{random_word[2]} --- {random_word[3]}\n\nЧтобы отключить отправку слов нажмите на команду /send_my_words")
-                        await bot.send_audio(user[1],
-                                             audio=open(os.path.join(os.getcwd(), "send_word_audio.mp3"), "rb"),
-                                             title='Озвучка')
-                        os.remove(os.path.join(os.getcwd(), "send_word_audio.mp3"))
-                    except Exception as e:
-                        print("Exception from send_random_word", e)
-                        continue
-                print(f"{user[3]} {'-' * 10} отправлено слово")
-        try:
-            os.remove(os.path.join(os.getcwd(), "send_word_audio.mp3"))
-            os.remove("send_word_audio.mp3")
-        except:
-            pass
-        await asyncio.sleep(600)
+# async def send_random_word_in_manually_database():
+#     while True:
+#         all_users = get_user_send_words_allow_status()
+#         rows = get_all_items_from_db("english_words.db", "english_words")
+#         random_word = rows[random.randint(0, len(rows) - 1)]
+#         tts = gtts.gTTS(random_word[2])
+#         tts.save("send_word_audio.mp3")
+#         print("i am working: ", all_users)
+#         for user in all_users:
+#             if user[4] == "yes":
+#                 print("user_id", user[1])
+#                 if random_word[4] != "no examples":
+#                     await bot.send_message(user[1], f"{random_word[2]} --- {random_word[3]}\n\n{random_word[4]}\n\nЧтобы отключить отправку слов нажмите на команду /send_my_words")
+#                     await bot.send_audio(user[1],
+#                                          audio=open(os.path.join(os.getcwd(), "send_word_audio.mp3"), "rb"),
+#                                          title='Озвучка')
+#                     os.remove(os.path.join(os.getcwd(), "send_word_audio.mp3"))
+#                 else:
+#                     try:
+#                         await bot.send_message(user[1], f"{random_word[2]} --- {random_word[3]}\n\nЧтобы отключить отправку слов нажмите на команду /send_my_words")
+#                         await bot.send_audio(user[1],
+#                                              audio=open(os.path.join(os.getcwd(), "send_word_audio.mp3"), "rb"),
+#                                              title='Озвучка')
+#                         os.remove(os.path.join(os.getcwd(), "send_word_audio.mp3"))
+#                     except Exception as e:
+#                         print("Exception from send_random_word", e)
+#                         continue
+#                 print(f"{user[3]} {'-' * 10} отправлено слово")
+#         try:
+#             os.remove(os.path.join(os.getcwd(), "send_word_audio.mp3"))
+#             os.remove("send_word_audio.mp3")
+#         except:
+#             pass
+#         await asyncio.sleep(600)
 
 
 def two_():
