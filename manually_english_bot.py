@@ -98,10 +98,11 @@ async def send_message_to_developer(message: types.Message, state: FSMContext):
     await message.answer("Ваше сообщение отправлено. Я отвечу вам, если это предложение или жалоба.\n"
                         "Если благодарность, то позвольте сказать Спасибо через это сообщение :)\n"
                         "Это для меня очень ценно!")
-    text_for_dev = f"Сообщение от пользователя: id: {message.from_user.id}, " \
-                   f"Имя: {message.from_user.full_name} \n\n" \
-                   f"USERNAME: @{message.from_user.username}" \
-                   f"Сообщение:\n\n" + \
+    text_for_dev = f"MESSAGE FROM:\n\n" \
+                   f"id: {message.from_user.id}, " \
+                   f"USER: {message.from_user.full_name} \n\n" \
+                   f"USERNAME: @{message.from_user.username}\n\n" \
+                   f"MESSAGE:\n\n" + \
                     message.text
     await bot.send_message(596834788, text_for_dev)
     await bot.send_message(message.chat.id, my_commands)
