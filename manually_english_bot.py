@@ -359,15 +359,10 @@ async def delete_work_state1(message: types.Message, state: FSMContext):
 #             pass
 #         await asyncio.sleep(600)
 
-# @dp.message_handler()
-# async def nothing_to_stop():
-#     # stop нечего остановить
-#     pass
-
-@dp.message_handler(commands=["to_her"])
-async def help_text(message: types.Message):
-    await bot.send_message(1053013455, "Напиши мне. Если скучаешь")
-    await bot.send_message(596834788, 'was send message to her')
+@dp.message_handler()
+async def nothing_to_stop(message: types.Message):
+    if message.text == "stop":
+        await bot.send_message(message.from_user.id, "Нет процессов для остановки")
 
 
 def two_():
