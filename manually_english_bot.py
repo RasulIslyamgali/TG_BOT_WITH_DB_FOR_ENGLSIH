@@ -62,10 +62,13 @@ class DeleteWord(StatesGroup):
 class TransalteAndPronounce(StatesGroup):
     hendle1 = State()
 
+class SendMessageToAllAboutUpdates(StatesGroup):
+    hendle1 = State()
+
 
 @dp.message_handler(commands=["start"])
 async def say_hi(message: types.Message):
-    await message.reply("Привет\n\nНажми на /help")
+    await message.reply(f"Привет {message.from_user.first_name}\n\nНажми на /help")
     if add_new_unique_users(user_name=message.from_user.full_name, user_id=message.from_user.id, bot=bot):
         await bot.send_message(596834788, f"NEW USER:\n\nID: {message.from_user.id}\n\nUSERNAME: @{message.from_user.username}"
                                           f"\n\n"
@@ -175,7 +178,7 @@ async def translate_and_pronounce(message: types.Message, state: FSMContext):
     tts = gtts.gTTS(text_for_pronounce)
     tts.save("translate_and_pronounce.mp3")
     await bot.send_audio(message.from_user.id,
-                         audio=open(os.path.join(os.getcwd(), "translate_and_pronounce.mp3"), "rb"), title='Озвучка')
+                         audio=open(os.path.join(os.getcwd(), "translate_and_pronounce.mp3"), "rb"), title=f'Озвучка {text_for_pronounce[:6]}...')
     os.remove(os.path.join(os.getcwd(), "translate_and_pronounce.mp3"))
     await bot.send_message(message.chat.id,
                            "\nЧтобы выйти из режиме перевода введите слово 'stop'\nИли введите следующий текст",
@@ -359,10 +362,28 @@ async def delete_work_state1(message: types.Message, state: FSMContext):
 #             pass
 #         await asyncio.sleep(600)
 
+@dp.message_handler(commands=["about_update"], state=None)
+async def about_update_command_part(message: types.Message):
+    await bot.send_message(596834788, "Введите текст для отправки всем пользователям бота")
+    await SendMessageToAllAboutUpdates.first()
+
+
+@dp.message_handler(state=SendMessageToAllAboutUpdates.hendle1)
+async def about_update_send_message(message: types.Message, state: FSMContext):
+    date = datetime.datetime.today().strftime("%Y%m%d")
+    id_list = get_all_unique_user_id()
+    if id_list:
+        for id_ in id_list:
+            await bot.send_message(id_, f"Обновления: {date}\n\n{message.text}")
+    await state.finish()
+
+
 @dp.message_handler()
 async def nothing_to_stop(message: types.Message):
     if message.text == "stop":
         await bot.send_message(message.from_user.id, "Нет процессов для остановки")
+    else:
+        await bot.send_message(message.from_user.id, "Я вас не понял")
 
 
 def two_():

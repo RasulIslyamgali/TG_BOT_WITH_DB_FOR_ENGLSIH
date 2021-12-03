@@ -69,6 +69,36 @@ def add_new_unique_users(user_id, bot, user_name="empty"):
             return new_user_added
 
 
+def get_all_unique_user_id(**kwargs):
+    try:
+        connect = psycopg2.connect(
+                host=host,
+                user=user,
+                database=db_name,
+                port=port,
+                password=password
+        )
+
+        with connect.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT user_id from unique_users;
+                """
+            )
+            user_id_list = cursor.fetchall()
+            try:
+                if connect:
+                    connect.close()
+                    print("[INFO] PostgreSQL connection closed")
+            except Exception as e:
+                print("[INFO] Error in finally block add_new_unique_users", e)
+
+            return user_id_list
+    except Exception as e:
+        print(f"[INFO] Error while connnect to Postgre database. Exception: {e}")
+        return 0
+
+
 def check_exist_status_user_id(user_id: int):
     try:
         connection = psycopg2.connect(
