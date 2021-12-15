@@ -383,7 +383,10 @@ async def nothing_to_stop(message: types.Message):
     if message.text == "stop":
         await bot.send_message(message.from_user.id, "Нет процессов для остановки")
     else:
-        await bot.send_message(message.from_user.id, "Я вас не понял")
+        await bot.send_message(message.from_user.id, "Я вас не понял\n\n"
+                                                     "Если вы хотите перевести текст,"
+                                                     "\nсначала нажмите на /translate\n\n"
+                                                     "Для других команд нажмите /help")
 
 
 def two_():

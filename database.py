@@ -57,6 +57,7 @@ def add_new_unique_users(user_id, bot, user_name="empty"):
         print("[INFO] Error while working with PostgreSQL", e)
     finally:
         # cursor.close()
+        global new_user_added
         try:
             if connection:
                 connection.close()
