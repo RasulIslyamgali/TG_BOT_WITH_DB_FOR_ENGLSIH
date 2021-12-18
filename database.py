@@ -6,6 +6,7 @@ from config import host, user, db_name, port, password
 
 
 def add_new_unique_users(user_id, bot, user_name="empty"):
+    global new_user_added
     date = datetime.datetime.today()
     try:
         connection = psycopg2.connect(
@@ -57,7 +58,6 @@ def add_new_unique_users(user_id, bot, user_name="empty"):
         print("[INFO] Error while working with PostgreSQL", e)
     finally:
         # cursor.close()
-        global new_user_added
         try:
             if connection:
                 connection.close()
