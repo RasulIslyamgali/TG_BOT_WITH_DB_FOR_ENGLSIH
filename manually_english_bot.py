@@ -27,6 +27,7 @@ ad = AlphabetDetector()
 # API_TOKEN = "2138914251:AAHWAnmH5M3CkP8h6NNzovtSdLbPcbfWBFU" # for test
 API_TOKEN = "2084797470:AAGCdEzL5n_gn27VoeQyW_hf7PwesGghLfM"
 
+
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
 
@@ -37,10 +38,11 @@ dp = Dispatcher(bot=bot, storage=MemoryStorage())
 # get_all_words_button = KeyboardButton("Get all words")
 # help_button = KeyboardButton("Help")
 stop_button = KeyboardButton("stop")
+reverse_translation = KeyboardButton("Обратный перевод")
 
 # all_buttons = ReplyKeyboardMarkup(resize_keyboard=True).row(add_word_button, translate_button).row(get_all_words_button, help_button).row(send_message_to_dev_botton)
 # # all_buttons = ReplyKeyboardMarkup(resize_keyboard=True).row(add_word_button, translate_button, send_message_to_dev_botton, get_all_words_button, help_button)
-stop_button_show = ReplyKeyboardMarkup(resize_keyboard=True).add(stop_button)
+stop_button_show = ReplyKeyboardMarkup(resize_keyboard=True).add(stop_button).row(reverse_translation)
 
 
 class SendMessageToDev(StatesGroup):
@@ -64,6 +66,9 @@ class TransalteAndPronounce(StatesGroup):
 
 class SendMessageToAllAboutUpdates(StatesGroup):
     hendle1 = State()
+
+
+last_word = ""
 
 
 @dp.message_handler(commands=["start"])
@@ -158,22 +163,29 @@ async def with_command_translate_and_pronounce(message: types.Message):
 
 @dp.message_handler(state=TransalteAndPronounce.hendle1)
 async def translate_and_pronounce(message: types.Message, state: FSMContext):
-    text_for_pronounce = ""
+    global last_word
+
     if message.text == "stop":
         await state.finish()
         await bot.send_message(message.chat.id, "Бот вернулся в исходное состояние")
         await bot.send_message(message.chat.id, my_commands)
-        return
-    if ad.only_alphabet_chars(f"{message.text}", "CYRILLIC"):
-        translated = translator.translate(text=message.text, dest="en")
-        text_for_pronounce = translated
-    elif ad.detect_alphabet(u'Cyrillic and кириллический') == {'CYRILLIC', 'LATIN'} and not ad.is_latin(
-            f"{message.text}"):
-        translated = translator.translate(text=message.text, dest="en")
-        text_for_pronounce = translated
+        return None
+
+    if message.text.lower() == "обратный перевод":
+        text_for_pronounce_translate = last_word
     else:
-        translated = translator.translate(text=message.text, dest="ru")
-        text_for_pronounce = message.text
+        text_for_pronounce_translate = message.text
+
+    if ad.only_alphabet_chars(f"{text_for_pronounce_translate}", "CYRILLIC"):
+        translated = translator.translate(text=text_for_pronounce_translate, dest="en")
+        text_for_pronounce = translated.text
+    elif ad.detect_alphabet(u'Cyrillic and кириллический') == {'CYRILLIC', 'LATIN'} and not ad.is_latin(
+            f"{text_for_pronounce_translate}"):
+        translated = translator.translate(text=text_for_pronounce_translate, dest="en")
+        text_for_pronounce = translated.text
+    else:
+        translated = translator.translate(text=text_for_pronounce_translate, dest="ru")
+        text_for_pronounce = text_for_pronounce_translate
     await bot.send_message(message.chat.id, translated.text)
     tts = gtts.gTTS(text_for_pronounce)
     tts.save("translate_and_pronounce.mp3")
@@ -183,6 +195,12 @@ async def translate_and_pronounce(message: types.Message, state: FSMContext):
     await bot.send_message(message.chat.id,
                            "\nЧтобы выйти из режиме перевода введите слово 'stop'\nИли введите следующий текст",
                            reply_markup=stop_button_show)
+
+    # save last word for able reverse translation
+    if message.text.lower() == "обратный перевод" or message.text.lower() == "stop":
+        pass
+    else:
+        last_word = translated.text
 
 
 @dp.message_handler(commands=["add_new_word"], state=None)
