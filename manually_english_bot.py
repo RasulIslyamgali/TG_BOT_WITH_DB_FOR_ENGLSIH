@@ -25,7 +25,7 @@ translator = Translator(service_urls=['translate.googleapis.com'])
 ad = AlphabetDetector()
 
 # API_TOKEN = "2138914251:AAHWAnmH5M3CkP8h6NNzovtSdLbPcbfWBFU" # for test
-API_TOKEN = "2084797470:AAGCdEzL5n_gn27VoeQyW_hf7PwesGghLfM"
+API_TOKEN = "2084797470:AAESz_uWBYbMGWVNMWzcXcyQ85G-W5ZyHRM"
 
 
 bot = Bot(token=API_TOKEN)
