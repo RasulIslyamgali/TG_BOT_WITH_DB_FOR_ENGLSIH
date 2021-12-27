@@ -5,69 +5,69 @@ import psycopg2
 from config import host, user, db_name, port, password
 
 
-def add_new_unique_users(user_id, bot, user_name="empty"):
-    global new_user_added
-    date = datetime.datetime.today()
-    try:
-        connection = psycopg2.connect(
-            host=host,
-            user=user,
-            database=db_name,
-            port=port,
-            password=password
-        )
-
-        # CHECK CONNECT
-        # with connection.cursor() as cursor:
-        #     cursor.execute(
-        #         "SELECT version();"
-        #     )
-        #     print(f"SERVER VERSION: {cursor.fetchone()}")
-        # CREATE TABLE
-        # with connection.cursor() as cursor:
-        #     cursor.execute(
-        #         """
-        #         CREATE TABLE unique_users(
-        #         id serial PRIMARY KEY,
-        #         date varchar(50) NOT NULL,
-        #         user_id INT NOT NULL,
-        #         user_name varchar(100)
-        #         );
-        #         """
-        #     )
-        #     connection.commit()
-        # if need to change specific column type
-        # with connection.cursor() as cursor:
-        #     cursor.execute("""
-        #     ALTER TABLE unique_users
-        #     ALTER COLUMN user_id TYPE INT;
-        #     """)
-        #     connection.commit()
-        new_user_added = False
-        if not check_exist_status_user_id(user_id=user_id):
-            with connection.cursor() as cursor:
-                cursor.execute(f"""
-                INSERT INTO unique_users (date, user_id, user_name)
-                VALUES('{date}', {user_id}, '{user_name}');
-                """)
-                connection.commit()
-                new_user_added = True
-        else:
-            print("user already exist")
-    except Exception as e:
-        print("[INFO] Error while working with PostgreSQL", e)
-    finally:
-        # cursor.close()
-        try:
-            if connection:
-                connection.close()
-                print("[INFO] PostgreSQL connection closed")
-                return new_user_added
-            else:
-                return new_user_added
-        except Exception as e:
-            print("[INFO] Error in finally block add_new_unique_users", e)
-            return new_user_added
+# def add_new_unique_users(user_id, bot, user_name="empty"):
+#     global new_user_added
+#     date = datetime.datetime.today()
+#     try:
+#         connection = psycopg2.connect(
+#             host=host,
+#             user=user,
+#             database=db_name,
+#             port=port,
+#             password=password
+#         )
+#
+#         # CHECK CONNECT
+#         # with connection.cursor() as cursor:
+#         #     cursor.execute(
+#         #         "SELECT version();"
+#         #     )
+#         #     print(f"SERVER VERSION: {cursor.fetchone()}")
+#         # CREATE TABLE
+#         # with connection.cursor() as cursor:
+#         #     cursor.execute(
+#         #         """
+#         #         CREATE TABLE unique_users(
+#         #         id serial PRIMARY KEY,
+#         #         date varchar(50) NOT NULL,
+#         #         user_id INT NOT NULL,
+#         #         user_name varchar(100)
+#         #         );
+#         #         """
+#         #     )
+#         #     connection.commit()
+#         # if need to change specific column type
+#         # with connection.cursor() as cursor:
+#         #     cursor.execute("""
+#         #     ALTER TABLE unique_users
+#         #     ALTER COLUMN user_id TYPE INT;
+#         #     """)
+#         #     connection.commit()
+#         new_user_added = False
+#         if not check_exist_status_user_id(user_id=user_id):
+#             with connection.cursor() as cursor:
+#                 cursor.execute(f"""
+#                 INSERT INTO unique_users (date, user_id, user_name)
+#                 VALUES('{date}', {user_id}, '{user_name}');
+#                 """)
+#                 connection.commit()
+#                 new_user_added = True
+#         else:
+#             print("user already exist")
+#     except Exception as e:
+#         print("[INFO] Error while working with PostgreSQL", e)
+#     finally:
+#         # cursor.close()
+#         try:
+#             if connection:
+#                 connection.close()
+#                 print("[INFO] PostgreSQL connection closed")
+#                 return new_user_added
+#             else:
+#                 return new_user_added
+#         except Exception as e:
+#             print("[INFO] Error in finally block add_new_unique_users", e)
+#             return new_user_added
 
 
 def get_all_unique_user_id(**kwargs):
