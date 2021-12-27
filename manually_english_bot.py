@@ -29,10 +29,6 @@ import random
 translator = Translator(service_urls=['translate.googleapis.com'])
 ad = AlphabetDetector()
 
-load_dotenv()
-
-# API_TOKEN = os.getenv("API_TOKEN_TEST")
-
 API_TOKEN = os.getenv("API_TOKEN")
 
 bot = Bot(token=API_TOKEN)
