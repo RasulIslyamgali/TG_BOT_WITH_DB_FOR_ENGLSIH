@@ -1,4 +1,7 @@
 import datetime
+import os
+import time
+
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.dispatcher.filters.state import StatesGroup, State
@@ -6,11 +9,13 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 import asyncio
-from database import *
 from googletrans import Translator
 from alphabet_detector import AlphabetDetector
 import gtts
-import os, time
+from dotenv import load_dotenv
+
+from database import *
+
 # import pytesseract as tess
 # tess.pytesseract.tesseract_cmd = r"C:\Users\User\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
 # tess.pytesseract.tesseract_cmd = os.path.join(os.getcwd(), "Tesseract-OCR", "tesseract.exe")
@@ -24,9 +29,11 @@ import random
 translator = Translator(service_urls=['translate.googleapis.com'])
 ad = AlphabetDetector()
 
-# API_TOKEN = "2138914251:AAHWAnmH5M3CkP8h6NNzovtSdLbPcbfWBFU" # for test
-API_TOKEN = "2084797470:AAESz_uWBYbMGWVNMWzcXcyQ85G-W5ZyHRM"
+load_dotenv()
 
+# API_TOKEN = os.getenv("API_TOKEN_TEST")
+
+API_TOKEN = os.getenv("API_TOKEN")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
