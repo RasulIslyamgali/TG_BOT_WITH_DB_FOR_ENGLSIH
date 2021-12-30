@@ -416,17 +416,6 @@ async def about_update_send_message(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.message_handler()
-async def nothing_to_stop(message: types.Message):
-    if message.text == "stop":
-        await bot.send_message(message.from_user.id, "Нет процессов для остановки")
-    else:
-        await bot.send_message(message.from_user.id, "Я вас не понял\n\n"
-                                                     "Если вы хотите перевести текст,"
-                                                     "\nсначала нажмите на /translate\n\n"
-                                                     "Для других команд нажмите /help")
-
-
 @dp.message_handler(commands=["get_all_users"])
 async def get_all_users_from_mongo_db(message: types.Message):
     global users_mongo_collection
@@ -438,6 +427,17 @@ async def get_all_users_from_mongo_db(message: types.Message):
         string += str(doc["added_date"]) + "\n\n"
 
     await bot.send_message(596834788, string)
+
+
+@dp.message_handler()
+async def nothing_to_stop(message: types.Message):
+    if message.text == "stop":
+        await bot.send_message(message.from_user.id, "Нет процессов для остановки")
+    else:
+        await bot.send_message(message.from_user.id, "Я вас не понял\n\n"
+                                                     "Если вы хотите перевести текст,"
+                                                     "\nсначала нажмите на /translate\n\n"
+                                                     "Для других команд нажмите /help")
 
 
 def two_():
