@@ -16,8 +16,10 @@ collection = current_db["man_eng_users"]
 doc = {"user_name": "Georg", "user_id": 234354235, "added_date": "30.12.2021"}
 
 query = {"user_name": "Georg"}
-print(collection.find_one(query)["user_id"])
-print(collection.update_one(filter=query, update={"$set": {"user_id": "123"}}))
+# print(collection.find_one(query)["user_id"])
+# print(collection.update_one(filter=query, update={"$set": {"user_id": "123"}}))
 # collection.insert_many(doc)
 # param = {"user_name": "Adam"}
 # collection.delete_one(param)
+# print(collection.find({}))
+

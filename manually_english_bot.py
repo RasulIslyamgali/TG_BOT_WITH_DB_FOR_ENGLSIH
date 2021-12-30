@@ -427,6 +427,19 @@ async def nothing_to_stop(message: types.Message):
                                                      "Для других команд нажмите /help")
 
 
+@dp.message_handler(commands=["get_all_users"])
+async def get_all_users_from_mongo_db(message: types.Message):
+    global users_mongo_collection
+    string = ""
+    for doc in users_mongo_collection.find({}):
+        string += doc["user_name"] + "\n"
+        string += str(doc["user_id"]) + "\n"
+        string += str(doc["push_start_count"]) + "\n"
+        string += str(doc["added_date"]) + "\n\n"
+
+    await bot.send_message(596834788, string)
+
+
 def two_():
     while True:
         try:
