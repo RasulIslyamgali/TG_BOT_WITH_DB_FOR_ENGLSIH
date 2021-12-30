@@ -25,10 +25,9 @@ import schedule
 import random
 # import cv2
 
-
 translator = Translator(service_urls=['translate.googleapis.com'])
 ad = AlphabetDetector()
-
+load_dotenv() # it is needed if i run from localhost
 API_TOKEN = os.getenv("API_TOKEN")
 
 bot = Bot(token=API_TOKEN)
@@ -74,6 +73,10 @@ class SendMessageToAllAboutUpdates(StatesGroup):
 last_word = ""
 
 
+# connect to database
+users_mongo_collection = connect_to_mongo_atlas_and_to_main_db()
+
+
 @dp.message_handler(commands=["start"])
 async def say_hi(message: types.Message):
     await message.reply(f"Привет {message.from_user.first_name}\n\nНажми на /help")
@@ -81,8 +84,20 @@ async def say_hi(message: types.Message):
     #     await bot.send_message(596834788, f"NEW USER:\n\nID: {message.from_user.id}\n\nUSERNAME: @{message.from_user.username}"
     #                                       f"\n\n"
     #                                       f"USER: {message.from_user.full_name}")
-    doc = {"user_name": message.from_user.full_name, "user_id": message.from_user.id, "added_date": datetime.datetime.utcnow()}
-    connect_to_mongo_atlas_and_to_main_db().insert_one(document=doc)
+    doc = {"user_name": message.from_user.full_name, "user_id": message.from_user.id, "push_start_count": 1, "added_date": datetime.datetime.utcnow()}
+
+    query = {"user_id": message.from_user.id}
+    try:
+        if users_mongo_collection.find_one(query) is None:
+            users_mongo_collection.insert_one(document=doc)
+            await bot.send_message(596834788, f"[INFO] New user added:\n\n"
+                                              f"User: {message.from_user.full_name}\n"
+                                              f"ID: {message.from_user.id}")
+        else:
+            push_start_count = users_mongo_collection.find_one(query)["push_start_count"] + 1
+            print(users_mongo_collection.update_one(filter=query, update={"$set": {"push_start_count": push_start_count}}))
+    except Exception as e:
+        print(f"{datetime.datetime.utcnow()} [INFO] Exception while add new user to Mongo database. Exception: {e})")
 
 my_commands = """
     Список доступных команд:

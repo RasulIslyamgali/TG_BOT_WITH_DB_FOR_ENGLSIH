@@ -292,7 +292,8 @@ def set_user_send_word_allow_status(user_id, user_fullname):
 
 def connect_to_mongo_atlas_and_to_main_db():
     # connect
-    db_client = pymongo.MongoClient("mongodb+srv://manuallyenglish:sshdfkj36457.@manuallyeng.zj2ei.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+    conn_string = os.getenv("URI_MONGO")
+    db_client = pymongo.MongoClient(conn_string)
 
     # create or connect to database
     current_db = db_client["test"]
@@ -301,13 +302,3 @@ def connect_to_mongo_atlas_and_to_main_db():
     collection = current_db["man_eng_users"]
 
     return collection
-
-    # # print(current_db.list_collection_names())
-    # doc = [{"user_name": "Adam", "user_id": 121212123, "added_date": "30.12.2021"},
-    #        {"user_name": "Джордж", "user_id": 12314543, "added_date": "29.12.2021"}
-    # ]
-    #
-    # # collection.insert_one(doc)
-    # # collection.insert_many(doc)
-    # param = {"user_name": "Adam"}
-    # collection.delete_one(param)
