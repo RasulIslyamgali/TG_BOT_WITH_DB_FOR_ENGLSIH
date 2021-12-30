@@ -74,10 +74,6 @@ class SendMessageToAllAboutUpdates(StatesGroup):
 last_word = ""
 
 
-# connect to database
-users_mongo_collection = connect_to_mongo_atlas_and_to_main_db()
-
-
 @dp.message_handler(commands=["start"])
 async def say_hi(message: types.Message):
     await message.reply(f"Привет {message.from_user.first_name}\n\nНажми на /help")
@@ -86,7 +82,7 @@ async def say_hi(message: types.Message):
     #                                       f"\n\n"
     #                                       f"USER: {message.from_user.full_name}")
     doc = {"user_name": message.from_user.full_name, "user_id": message.from_user.id, "added_date": datetime.datetime.utcnow()}
-    users_mongo_collection.insert_one(document=doc)
+    connect_to_mongo_atlas_and_to_main_db().insert_one(document=doc)
 
 my_commands = """
     Список доступных команд:
