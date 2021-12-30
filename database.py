@@ -301,4 +301,4 @@ def connect_to_mongo_atlas_and_to_main_db():
     # create or connect to collection(table)
     collection = current_db["man_eng_users"]
 
-    return collection, db_client
+    return collection
