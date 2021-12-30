@@ -3,6 +3,7 @@ import datetime
 import os
 import psycopg2
 from config import host, user, db_name, port, password
+import pymongo
 
 
 # def add_new_unique_users(user_id, bot, user_name="empty"):
@@ -287,3 +288,26 @@ def set_user_send_word_allow_status(user_id, user_fullname):
     connect.execute(f"INSERT INTO send_word_allow_status (user_id, user_fullname, allow_status) VALUES(?, ?, ?);", (user_id, user_fullname, "yes"))
     connect.commit()
     connect.close()
+
+
+def connect_to_mongo_atlas_and_to_main_db():
+    # connect
+    db_client = pymongo.MongoClient("mongodb+srv://manuallyenglish:sshdfkj36457.@manuallyeng.zj2ei.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+
+    # create or connect to database
+    current_db = db_client["test"]
+
+    # create or connect to collection(table)
+    collection = current_db["man_eng_users"]
+
+    return collection
+
+    # # print(current_db.list_collection_names())
+    # doc = [{"user_name": "Adam", "user_id": 121212123, "added_date": "30.12.2021"},
+    #        {"user_name": "Джордж", "user_id": 12314543, "added_date": "29.12.2021"}
+    # ]
+    #
+    # # collection.insert_one(doc)
+    # # collection.insert_many(doc)
+    # param = {"user_name": "Adam"}
+    # collection.delete_one(param)
