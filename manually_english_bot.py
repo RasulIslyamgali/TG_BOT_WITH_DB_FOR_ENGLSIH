@@ -3,7 +3,7 @@ import os
 import time
 
 from aiogram import Bot, Dispatcher, types, executor
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Command
@@ -70,7 +70,7 @@ class SendMessageToAllAboutUpdates(StatesGroup):
     hendle1 = State()
 
 
-last_word = ""
+last_word = "empty"
 
 
 # connect to database
@@ -188,7 +188,7 @@ async def translate_and_pronounce(message: types.Message, state: FSMContext):
     if message.text == "stop":
         await state.finish()
         await bot.send_message(message.chat.id, "Бот вернулся в исходное состояние")
-        await bot.send_message(message.chat.id, my_commands)
+        await bot.send_message(message.chat.id, my_commands, reply_markup=ReplyKeyboardRemove())
         return None
 
     if message.text.lower() == "обратный перевод":
