@@ -1,49 +1,30 @@
-import datetime
-import os
-import time
-
-from aiogram import Bot, Dispatcher, types, executor
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher.filters import Command
-from aiogram.dispatcher import FSMContext
 import asyncio
-from googletrans import Translator
-from alphabet_detector import AlphabetDetector
+
 import gtts
+from aiogram import Bot, Dispatcher, types, executor
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Command
+from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from alphabet_detector import AlphabetDetector
 from dotenv import load_dotenv
+from googletrans import Translator
 
 from database import *
-
-# import pytesseract as tess
-# tess.pytesseract.tesseract_cmd = r"C:\Users\User\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
-# tess.pytesseract.tesseract_cmd = os.path.join(os.getcwd(), "Tesseract-OCR", "tesseract.exe")
-# tess.pytesseract.tesseract_cmd = r"C:\Users\User\Desktop\Rasul\Python\any_projects_and_scripts\tg_bot_for_manually_english\manually_english_bot"
-# from PIL import Image
-import schedule
-import random
-# import cv2
+from properties import my_commands
 
 translator = Translator(service_urls=['translate.googleapis.com'])
 ad = AlphabetDetector()
-load_dotenv() # it is needed if i run from localhost
+load_dotenv()  # it is needed if run from localhost
 API_TOKEN = os.getenv("API_TOKEN")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
 
-# Buttons
-# add_word_button = KeyboardButton("Add new word")
-# translate_button = KeyboardButton("Translate")
-# send_message_to_dev_botton = KeyboardButton("Send message to developer")
-# get_all_words_button = KeyboardButton("Get all words")
-# help_button = KeyboardButton("Help")
 stop_button = KeyboardButton("stop")
 reverse_translation = KeyboardButton("Обратный перевод")
 
-# all_buttons = ReplyKeyboardMarkup(resize_keyboard=True).row(add_word_button, translate_button).row(get_all_words_button, help_button).row(send_message_to_dev_botton)
-# # all_buttons = ReplyKeyboardMarkup(resize_keyboard=True).row(add_word_button, translate_button, send_message_to_dev_botton, get_all_words_button, help_button)
 stop_button_show = ReplyKeyboardMarkup(resize_keyboard=True).add(stop_button).row(reverse_translation)
 
 
@@ -66,24 +47,29 @@ class DeleteWord(StatesGroup):
 class TransalteAndPronounce(StatesGroup):
     hendle1 = State()
 
+
 class SendMessageToAllAboutUpdates(StatesGroup):
     hendle1 = State()
 
 
+class AddWord(StatesGroup):
+    hendle1 = State()
+    hendle2 = State()
+
+
 last_word = "empty"
 
-
 # connect to database
-users_mongo_collection = connect_to_mongo_atlas_and_to_main_db()
+db_client = pymongo_client()
+
+test_db = connect_to_mongo_db(db_client=db_client, db_name="test")
+
+users_mongo_collection = connect_to_mongo_atlas_and_to_main_db(current_db=test_db)
 
 
 @dp.message_handler(commands=["start"])
 async def say_hi(message: types.Message):
     await message.reply(f"Привет {message.from_user.first_name}\n\nНажми на /help")
-    # if add_new_unique_users(user_name=message.from_user.full_name, user_id=message.from_user.id, bot=bot):
-    #     await bot.send_message(596834788, f"NEW USER:\n\nID: {message.from_user.id}\n\nUSERNAME: @{message.from_user.username}"
-    #                                       f"\n\n"
-    #                                       f"USER: {message.from_user.full_name}")
     doc = {"user_name": message.from_user.full_name, "user_id": message.from_user.id, "push_start_count": 1, "added_date": datetime.datetime.utcnow()}
 
     query = {"user_id": message.from_user.id}
@@ -95,24 +81,43 @@ async def say_hi(message: types.Message):
                                               f"ID: {message.from_user.id}")
         else:
             push_start_count = users_mongo_collection.find_one(query)["push_start_count"] + 1
-            print(users_mongo_collection.update_one(filter=query, update={"$set": {"push_start_count": push_start_count}}))
+            users_mongo_collection.update_one(filter=query, update={"$set": {"push_start_count": push_start_count}})
     except Exception as e:
         print(f"{datetime.datetime.utcnow()} [INFO] Exception while add new user to Mongo database. Exception: {e})")
-
-my_commands = """
-    Список доступных команд:
-    /start
-    /translate
-    /send_message_to_developer
-    """
-#     /send_my_words
-#     /delete_word
-# / add_new_word
 
 
 @dp.message_handler(commands=["help"])
 async def help_text(message: types.Message):
     await bot.send_message(message.from_user.id, my_commands)
+
+
+@dp.message_handler(commands=["add_word"])
+async def add_word_query_eng_word(message: types.Message):
+    await bot.send_message(message.from_user.id, "Напишите английское слово или фразу")
+    await AddWord.first()
+
+
+@dp.message_handler(state=AddWord.hendle1)
+async def add_word_query_ru_text(message: types.Message, state: FSMContext):
+    await state.update_data(eng_text=message.text)
+    await bot.send_message(message.from_user.id, "Напишите перевод")
+    await AddWord.hendle2.set()
+
+
+@dp.message_handler(state=AddWord.hendle2)
+async def get_ru_text_and_add_word_to_mongo_database(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    ru_text = message.text
+    words_collection = connect_to_words_collection(current_db=test_db, user_id=message.from_user.id)
+
+    document = {
+        "english_text": data["eng_text"],
+        "ru_text": ru_text
+    }
+
+    words_collection.insert_one(document=document)
+    await state.finish()
+    await bot.send_message(message.from_user.id, "Сделано")
 
 
 @dp.message_handler(Command("send_message_to_developer"), state=None)

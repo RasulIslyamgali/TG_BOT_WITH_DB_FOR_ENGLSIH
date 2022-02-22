@@ -4,4 +4,3 @@ from manually_english_bot import two_
 
 if __name__ == "__main__":
     Process(target=two_).start()
-    # Process(target=one_).start()

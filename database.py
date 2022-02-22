@@ -6,71 +6,6 @@ from config import host, user, db_name, port, password
 import pymongo
 
 
-# def add_new_unique_users(user_id, bot, user_name="empty"):
-#     global new_user_added
-#     date = datetime.datetime.today()
-#     try:
-#         connection = psycopg2.connect(
-#             host=host,
-#             user=user,
-#             database=db_name,
-#             port=port,
-#             password=password
-#         )
-#
-#         # CHECK CONNECT
-#         # with connection.cursor() as cursor:
-#         #     cursor.execute(
-#         #         "SELECT version();"
-#         #     )
-#         #     print(f"SERVER VERSION: {cursor.fetchone()}")
-#         # CREATE TABLE
-#         # with connection.cursor() as cursor:
-#         #     cursor.execute(
-#         #         """
-#         #         CREATE TABLE unique_users(
-#         #         id serial PRIMARY KEY,
-#         #         date varchar(50) NOT NULL,
-#         #         user_id INT NOT NULL,
-#         #         user_name varchar(100)
-#         #         );
-#         #         """
-#         #     )
-#         #     connection.commit()
-#         # if need to change specific column type
-#         # with connection.cursor() as cursor:
-#         #     cursor.execute("""
-#         #     ALTER TABLE unique_users
-#         #     ALTER COLUMN user_id TYPE INT;
-#         #     """)
-#         #     connection.commit()
-#         new_user_added = False
-#         if not check_exist_status_user_id(user_id=user_id):
-#             with connection.cursor() as cursor:
-#                 cursor.execute(f"""
-#                 INSERT INTO unique_users (date, user_id, user_name)
-#                 VALUES('{date}', {user_id}, '{user_name}');
-#                 """)
-#                 connection.commit()
-#                 new_user_added = True
-#         else:
-#             print("user already exist")
-#     except Exception as e:
-#         print("[INFO] Error while working with PostgreSQL", e)
-#     finally:
-#         # cursor.close()
-#         try:
-#             if connection:
-#                 connection.close()
-#                 print("[INFO] PostgreSQL connection closed")
-#                 return new_user_added
-#             else:
-#                 return new_user_added
-#         except Exception as e:
-#             print("[INFO] Error in finally block add_new_unique_users", e)
-#             return new_user_added
-
-
 def get_all_unique_user_id(**kwargs):
     try:
         connect = psycopg2.connect(
@@ -263,6 +198,7 @@ def change_user_send_word_allow_status(user_id, allow_status):
     connect.commit()
     connect.close()
 
+
 def create_user_and_status_table():
     connect = sqlite3.connect(os.path.join(os.getcwd(), "english_words.db"))
     connect.cursor()
@@ -290,15 +226,30 @@ def set_user_send_word_allow_status(user_id, user_fullname):
     connect.close()
 
 
-def connect_to_mongo_atlas_and_to_main_db():
+def pymongo_client():
     # connect
     conn_string = os.getenv("URI_MONGO")
     db_client = pymongo.MongoClient(conn_string)
 
-    # create or connect to database
-    current_db = db_client["test"]
+    return db_client
 
+
+def connect_to_mongo_db(db_client, db_name: str):
+    # create or connect to database
+    current_db = db_client[db_name]
+
+    return current_db
+
+
+def connect_to_mongo_atlas_and_to_main_db(current_db):
     # create or connect to collection(table)
     collection = current_db["man_eng_users"]
+
+    return collection
+
+
+def connect_to_words_collection(current_db, user_id: int):
+    # create or connect to collection(table)
+    collection = current_db[f"user_words_{user_id}"]
 
     return collection
